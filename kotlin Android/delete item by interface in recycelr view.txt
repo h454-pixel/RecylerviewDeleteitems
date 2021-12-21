@@ -1,0 +1,153 @@
+package com.example.kotlininterface
+
+import android.content.Context
+import android.content.DialogInterface
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
+
+ class MainActivity : AppCompatActivity() , RecyclerAdapter.OnItemClickListener{
+  //var context:Context ?=null
+    lateinit var movieList:ArrayList<Movie>
+    lateinit var recyclerAdapter:RecyclerAdapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+     var recyclerView  = findViewById<RecyclerView>(R.id.recyclerView)
+       movieList = arrayListOf<Movie>(
+            Movie("Iron Man", 7),
+            Movie("The Incredible Hulk", 6),
+            Movie("Iron Man 2", 7),
+            Movie("Thor", 8),
+            Movie("The Avengers", 9),
+            Movie("Iron Man 3", 8),
+            Movie("Thor: The Dark World", 8),
+            Movie("Captain America: The Winter Soldier", 10),
+            Movie("Guardians of the Galaxy", 8),
+            Movie("Avengers: Age of Ultron", 10)
+        )
+
+       recyclerAdapter = RecyclerAdapter(movieList, this)
+//        recyclerView.adapter = recyclerAdapter
+//        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+//        recyclerView.setHasFixedSize(true)
+        recyclerView.apply {
+            adapter = recyclerAdapter
+         //   addItemDecoration(DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL))
+            setHasFixedSize(true)
+        }
+    }
+
+    override fun onClick(position: Int) {
+//        // set the data in items
+//        holder.textView.setOnClickListener(View.OnClickListener {
+            val alertDialogBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
+            alertDialogBuilder.setTitle("Confirm Exit..!!!")
+            // Icon Of Alert Dialog
+            //   alertDialogBuilder.setIcon(R.drawable.question);
+            // Setting Alert Dialog Message
+            alertDialogBuilder.setMessage("Are you sure,You want to exit")
+            alertDialogBuilder.setCancelable(false)
+            alertDialogBuilder.setPositiveButton("Yes",
+                DialogInterface.OnClickListener { arg0, arg1 ->
+                    movieList.removeAt(position)
+                    recyclerAdapter.notifyItemRemoved(position); })
+            alertDialogBuilder.setNegativeButton("No",
+                DialogInterface.OnClickListener { dialog, which ->
+                    Toast.makeText(this, "You clicked over No", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                })
+            val alertDialog: AlertDialog = alertDialogBuilder.create()
+            alertDialog.show()
+        }
+
+
+
+    override fun onLongClick(position: Int) {
+
+//        movieList.removeAt(position)
+//        recyclerAdapter.notifyItemRemoved(position);
+        Toast.makeText(this, "onLongClick $position", Toast.LENGTH_LONG).show()
+    }
+
+
+}
+****************************************************************************************************************
+
+data class Movie(val name: String, val rating: Int)
+
+****************************************************************************************
+
+package com.example.kotlininterface
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+
+class RecyclerAdapter(private var movieList: ArrayList<Movie>, private val onItemClickListener: OnItemClickListener):RecyclerView.Adapter<RecyclerAdapter.ViewHolder>(){
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val view = layoutInflater.inflate(R.layout.desine_item, parent, false)
+        return ViewHolder(view, onItemClickListener)
+    }
+
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val movie = movieList[position]
+        holder.textView.text = movie.name
+
+      //  holder.bind(movie)
+    }
+    override fun getItemCount(): Int = movieList.size
+
+
+
+    class ViewHolder(itemView: View, onItemClickListener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
+
+       // var imageView: ImageView = itemView.findViewById(R.id.movieNameTextView)
+        var textView: TextView = itemView.findViewById(R.id.movieNameTextView)
+
+
+
+
+        init {
+            itemView.setOnClickListener {
+//                val snack: String = "Item Postion clciked: $adapterPosition"
+//                Snackbar.make(itemView, snack, Snackbar.LENGTH_SHORT).show()
+                onItemClickListener.onClick(adapterPosition)
+            }
+
+            itemView.setOnLongClickListener {
+                onItemClickListener.onLongClick(adapterPosition)
+                return@setOnLongClickListener true
+            }
+
+        }
+
+//        fun bind(movie: Movie) {
+//            itemView.m = movie.name
+//            itemView.ratingTextView.text = movie.rating.toString()
+//        }
+    }
+
+    interface OnItemClickListener {
+        fun onClick(position: Int)
+
+       // fun onLongClick(position: Int)
+        fun onLongClick(position: Int)
+    }
+}
+
+
+
+
+
+
+

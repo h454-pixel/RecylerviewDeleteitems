@@ -1,0 +1,10 @@
+ var first = editText.text.toString() //////// get text
+
+
+ edit.setonclicklistner //// Onclick...
+
+////// creating toast/////
+
+
+   val toast: Toast = Toast.makeText(context,"first", Toast.LENGTH_LONG)
+            toast.show()
